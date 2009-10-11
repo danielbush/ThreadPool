@@ -1,0 +1,56 @@
+ThreadPool
+
+ThreadPool is a class that you can instantiate to build a pool of running
+threads.  The threads wait on a Ruby Queue object for jobs - in the form of
+ruby blocks or lambdas - to perform.
+ThreadPool was written with the intention of being used on JRuby but
+will work on other rubies too.
+
+Send errors or issues to:
+  Daniel Bush 
+  email: dlb.id.au -at- gmail.com
+
+ThreadPool uses dispatch method with a block for putting jobs on
+the queue to be processed asynchronously:
+
+  tp = ThreadPool.new(5)  # Create 5 threads
+  # Dispatch an asynchronous task.
+  tp.dispatch do
+    ... your task ...
+  end
+
+Or lambdas
+
+  tp.dispatch some_func
+
+In fact as long as it responds to 'call' you're probably ok.
+
+At the moment it's assumed that you won't try to handle or modify thread
+control within the task itself.
+
+You can add or remove threads from the thread pool using 
+ThreadPool#increment and ThreadPool#decrement.  These methods
+haven't been fully tested yet.
+
+ThreadPool also has a SyncQueue class which represents a single queue and a
+single thread that synchronously executes the jobs in this queue.  You can
+instantiate one of these and it will run separate to the thread pool. To be
+honest I'm not sure why you need it but I was looking at the Grand Central
+Dispatch technique which seemed to have a similar concept.
+
+To get the documentation, type:
+  rdoc --exclude=tests/
+in the root directory of this project.
+
+ThreadPool is very new at this stage and there may still be some obvious
+errors.  Whilst the code is very simple, it is relatively untested aside from
+several live tests that you can use to see how it works.
+
+You can run all the live tests like this (in linux/unix shell):
+  for i in *.rb; do echo; echo $i; echo '-------'; jruby $i; done|less
+
+
+
+Regards,
+Daniel Bush
+11-Oct-09

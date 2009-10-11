@@ -1,0 +1,10 @@
+
+Version 0.3
+- First commit to git and github.
+- We have 
+  - a ThreadPool class which has a single queue and a store
+    of threads that contend for jobs stored on the queue.
+  - SyncQueue class which represents a single thread
+    and single queue where the jobs are executed synchronously.
+  - we can decrement or increment the threads on an instance
+    of ThreadPool.
