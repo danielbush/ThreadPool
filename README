@@ -47,6 +47,7 @@ errors.  Whilst the code is very simple, it is relatively untested aside from
 several live tests that you can use to see how it works.
 
 You can run all the live tests like this (in linux/unix shell):
+  cd tests/live
   for i in *.rb; do echo; echo $i; echo '-------'; jruby $i; done|less
 
 
