@@ -114,8 +114,9 @@ class ThreadPool
     def terminate
       @running=false
       @stopping=false
+      @left=[]
       while self.size>0
-        @left = self.pop
+        @left.push self.pop
       end
       self << lambda{}
         # Pass a blank function to unblock
