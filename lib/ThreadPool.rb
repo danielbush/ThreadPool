@@ -12,7 +12,7 @@
 class ThreadPool
   require 'thread'
 
-  attr_reader :mutex , :threads , :thread_count
+  attr_reader :threads , :thread_count
   attr_writer :debug
 
   # Initialize a ThreadPool instance with 'num' number
@@ -23,6 +23,7 @@ class ThreadPool
     @threads=[]
     @global_queue = Queue.new
     @mutex = Mutex.new
+      # Private mutex.
     self.increment(num)
   end
 
@@ -36,6 +37,7 @@ class ThreadPool
 
   def increment num=1
     num.times do
+      @mutex.synchronize do
       @threads.push(
         Thread.new do
           loop do
@@ -43,6 +45,7 @@ class ThreadPool
           end
         end
       )
+      end
     end
     @thread_count+=num
   end
@@ -54,7 +57,9 @@ class ThreadPool
     num.times do
       debug "Dispatching termination command" if @debug
       self.dispatch do
-        @threads.delete(Thread.current)
+        @mutex.synchronize do
+          @threads.delete(Thread.current)
+        end
         debug "Deleting thread #{Thread.current}" if @debug
         Thread.current.exit
       end

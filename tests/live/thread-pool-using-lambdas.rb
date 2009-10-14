@@ -2,8 +2,8 @@ require '../../lib/ThreadPool'
 
 # Create thread pool with 5 threads.
 tp = ThreadPool.new(5)
-
 tp.debug = true
+mutex = Mutex.new
 
 # Generate incrementing sequence.
 
@@ -22,7 +22,7 @@ seq = Sequence.new
 # Called at end of job.
 
 out = lambda do
-  tp.mutex.synchronize do
+  mutex.synchronize do
     puts "async job (#{seq.next} of 15) (#{Thread.current})"  
       # 'puts' needs to be synchronzied.
       # 'seq.next' needs to be synchronized.
@@ -57,7 +57,7 @@ end
 
 # Schedule 15 jobs to be run asynchronously.
 
-tp.mutex.synchronize do
+mutex.synchronize do
   puts "dispatching 15 jobs..."
 end
 
