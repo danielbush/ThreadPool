@@ -1,4 +1,4 @@
-require '../../ThreadPool'
+require '../../lib/ThreadPool'
 
 # We probably don't need to mutex here because
 # everything is synchronous.

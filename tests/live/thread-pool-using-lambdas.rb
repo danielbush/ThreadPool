@@ -1,4 +1,4 @@
-require '../../ThreadPool'
+require '../../lib/ThreadPool'
 
 # Create thread pool with 5 threads.
 tp = ThreadPool.new(5)

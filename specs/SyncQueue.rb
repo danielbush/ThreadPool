@@ -1,4 +1,4 @@
-require '../ThreadPool'
+require '../lib/ThreadPool'
 
 SQ=ThreadPool::SyncQueue
 TP=ThreadPool

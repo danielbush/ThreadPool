@@ -49,7 +49,7 @@ several live tests that you can use to see how it works.
 
 You can run all the live tests like this (in linux/unix shell):
   cd tests/live
-  for i in *.rb; do echo; echo $i; echo '-------'; jruby $i; done|less
+  sh test-all.sh
 
 Some rspec tests are in
   specs/
