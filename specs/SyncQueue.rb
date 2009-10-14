@@ -1,9 +1,10 @@
 require '../lib/ThreadPool'
+include ThreadPooling
 
-SQ=ThreadPool::SyncQueue
+SQ=SyncQueue
 TP=ThreadPool
 
-describe ThreadPool::SyncQueue do
+describe SyncQueue do
 
   it "should finish current job and return the rest if terminating" do
     sq = SQ.new

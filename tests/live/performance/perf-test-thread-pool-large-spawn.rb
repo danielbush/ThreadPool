@@ -1,4 +1,5 @@
-require '../../lib/ThreadPool'
+require '../../../lib/ThreadPool'
+include ThreadPooling
 
 # Note: you may get out of memory errors as you increase
 # the thread pool.

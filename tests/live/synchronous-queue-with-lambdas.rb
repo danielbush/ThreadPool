@@ -1,4 +1,5 @@
 require '../../lib/ThreadPool'
+include ThreadPooling
 
 # We probably don't need to mutex here because
 # everything is synchronous.
@@ -20,7 +21,7 @@ end
 
 # Schedule 3 jobs to be run synchronously.
 
-sq = ThreadPool::SyncQueue.new
+sq = SyncQueue.new
 1.upto(3) do |j|
   sq.dispatch gen_func.call(j)
 end

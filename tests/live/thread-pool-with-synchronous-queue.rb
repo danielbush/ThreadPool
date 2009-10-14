@@ -1,4 +1,5 @@
 require '../../lib/ThreadPool'
+include ThreadPooling
 
 # Create thread pool with 5 threads.
 tp = ThreadPool.new(5)
@@ -25,7 +26,7 @@ end
 
 # Now schedule 3 jobs to be run synchronously.
 
-sq = ThreadPool::SyncQueue.new
+sq = SyncQueue.new
 1.upto(3) do |j|
   sq.dispatch do
     sleep(4-j)
