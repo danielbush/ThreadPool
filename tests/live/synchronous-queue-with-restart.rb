@@ -1,4 +1,5 @@
 require '../../lib/ThreadPool'
+include ThreadPooling
 
 # We probably don't need to mutex here because
 # everything is synchronous.
@@ -7,7 +8,7 @@ require '../../lib/ThreadPool'
 # other SyncQueue instances.
 
 mutex = Mutex.new
-sq = ThreadPool::SyncQueue.new
+sq = SyncQueue.new
 
 # Schedule 3 jobs to be run synchronously.
 

@@ -9,106 +9,144 @@
 # 
 #
 
-class ThreadPool
-  require 'thread'
+module ThreadPooling
 
-  attr_reader :threads , :thread_count
-  attr_writer :debug
+  # A class containing an internal Queue and pool of threads.
+  #
+  # ThreadPool uses a 'dispatch' method with a block for putting jobs on
+  # the queue to be processed asynchronously:
+  # 
+  #   tp = ThreadPool.new(5)  # Create 5 threads
+  #   tp.dispatch do
+  #     ... your task ...
+  #   end
+  #
+  # Or lambdas
+  #
+  #   func = lambda { ... your task ... }
+  #   tp.dispatch func
+  #
+  # In fact, any object that responds to 'call' should be ok.
 
-  # Initialize a ThreadPool instance with 'num' number
-  # of threads.
 
-  def initialize num=1
-    @thread_count=0
-    @threads=[]
-      # Other option is to use ThreadGroup.
-    @global_queue = Queue.new
-    @mutex = Mutex.new
-      # Private mutex.
-    self.increment(num)
-  end
+  class ThreadPool
 
-  def debug msg
-    @mutex.synchronize do
-      puts msg
+    require 'thread'
+
+    attr_reader :threads , :thread_count
+    attr_writer :debug
+
+    # Initialize a ThreadPool instance with 'num' number
+    # of threads.
+
+    def initialize num=1
+      @thread_count=0
+      @threads=[]
+        # Other option is to use ThreadGroup.
+      @global_queue = Queue.new
+      @mutex = Mutex.new
+        # Private mutex.
+      self.increment(num)
     end
-  end
 
-  # Add threads to the pool
-
-  def increment num=1
-    num.times do
+    def debug msg
       @mutex.synchronize do
-        @threads.push(
-          Thread.new do
-            loop do
-              item = @global_queue.pop
-              case item
-              when Array
-                item[0].call(*item[1])
-                  # item[0] should be lambda; 
-                  # item[1] should be its args.
-              else
-                item.call
+        puts msg
+      end
+    end
+
+    # Add threads to the pool
+
+    def increment num=1
+      num.times do
+        @mutex.synchronize do
+          @threads.push(
+            Thread.new do
+              loop do
+                item = @global_queue.pop
+                case item
+                when Array
+                  item[0].call(*item[1])
+                    # item[0] should be lambda; 
+                    # item[1] should be its args.
+                else
+                  item.call
+                end
               end
             end
-          end
-        )
-      end
-    end
-    @thread_count+=num
-  end
-
-  # Remove threads from the pool
-
-  def decrement num=1
-    num=@thread_count if num>@thread_count
-    num.times do
-      debug "Dispatching termination command" if @debug
-      self.dispatch do
-        @mutex.synchronize do
-          @threads.delete(Thread.current)
+          )
         end
-        debug "Deleting thread #{Thread.current}" if @debug
-        Thread.current.exit
+      end
+      @thread_count+=num
+    end
+
+    # Remove threads from the pool
+
+    def decrement num=1
+      num=@thread_count if num>@thread_count
+      num.times do
+        debug "Dispatching termination command" if @debug
+        self.dispatch do
+          @mutex.synchronize do
+            @threads.delete(Thread.current)
+          end
+          debug "Deleting thread #{Thread.current}" if @debug
+          Thread.current.exit
+        end
+      end
+      @thread_count-=num
+    end
+
+    # The thread that calls this will block until
+    # the threads in @threads have finished.
+    # These threads will be terminated and the thread
+    # pool emptied.
+
+    def join
+      threads=@threads.dup
+        # Taking a copy here is really important!
+      self.decrement @thread_count
+        # Stop the threads or else suffer a deadlock.
+      threads.each do |t|
+        debug "joining thread #{t}" if @debug
+        t.join
       end
     end
-    @thread_count-=num
-  end
 
-  # The thread that calls this will block until
-  # the threads in @threads have finished.
-  # These threads will be terminated and the thread
-  # pool emptied.
+    # Dispatch jobs asynchronously.
 
-  def join
-    threads=@threads.dup
-      # Taking a copy here is really important!
-    self.decrement @thread_count
-      # Stop the threads or else suffer a deadlock.
-    threads.each do |t|
-      debug "joining thread #{t}" if @debug
-      t.join
-    end
-  end
-
-  # Dispatch jobs asynchronously.
-
-  def dispatch func=nil , args=nil , &block
-    if func.nil?
-      raise "Must be called with a block or lambda." unless block_given?
-    else
-      if args.nil?
-        @global_queue << func 
+    def dispatch func=nil , args=nil , &block
+      if func.nil?
+        raise "Must be called with a block or lambda." unless block_given?
       else
-        @global_queue << [func,args]
+        if args.nil?
+          @global_queue << func 
+        else
+          @global_queue << [func,args]
+        end
       end
+      @global_queue << block if block_given?
     end
-    @global_queue << block if block_given?
+
   end
 
   # A Queue that contains its own thread and which
   # dispatches jobs synchronously.
+  #
+  # Use it like:
+  #
+  #   sq = SyncQueue.new
+  #   sq.dispatch do
+  #     ... your task ...
+  #   end
+  #
+  # Or
+  #
+  #   sq.dispatch lambda { ... your task ... }
+  #
+  # Or
+  #
+  #   sq.push lambda { ... your task ... }
 
   class SyncQueue < Queue
 

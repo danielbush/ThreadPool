@@ -1,33 +1,21 @@
 require '../../lib/ThreadPool'
+include ThreadPooling
 
 # Create thread pool with 5 threads.
 tp = ThreadPool.new(5)
 tp.debug = true
 mutex = Mutex.new
-
-# Generate incrementing sequence.
-
-class Sequence
-  def initialize
-    @i=0
-  end
-  def next
-    @i+=1
-  end
-end
-
-seq = Sequence.new
-
+i=0
 
 # Called at end of job.
 
 out = lambda do
   mutex.synchronize do
-    puts "async job (#{seq.next} of 15) (#{Thread.current})"  
+    puts "async job (#{i+=1} of 15) (#{Thread.current})"  
       # 'puts' needs to be synchronzied.
-      # 'seq.next' needs to be synchronized.
-      # If we said: out.call "...#{seq.next}..." the call to seq
-      # would not be inside this mutex.
+      # 'i+=1' needs to be synchronized.
+      # If we said: out.call "...#{i+=1}..."
+      # it would not be inside this mutex.
       # This will lead to numbering errors eg
       # 1 of 15
       # 1 of 15

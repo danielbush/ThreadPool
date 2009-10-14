@@ -1,4 +1,5 @@
 require '../lib/ThreadPool'
+include ThreadPooling
 
 TP=ThreadPool
 

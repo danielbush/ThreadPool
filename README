@@ -4,7 +4,9 @@ ThreadPool is a class that you can instantiate to build a pool of running
 threads.  The threads wait on a Ruby Queue object for jobs - in the form of
 ruby blocks or lambdas - to perform.
 ThreadPool was written with the intention of being used on JRuby but
-will work on other rubies too.
+will work on other rubies too especially ruby 1.9+.
+Note: at the moment no effort has been made to patch ruby 1.8.* for
+any threading issues.
 
 Send errors or issues to:
   Daniel Bush 
