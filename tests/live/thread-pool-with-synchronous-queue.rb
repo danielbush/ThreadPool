@@ -2,11 +2,11 @@ require '../../lib/ThreadPool'
 
 # Create thread pool with 5 threads.
 tp = ThreadPool.new(5)
-
 tp.debug = true
+mutex = Mutex.new
 
 out = lambda do |msg|
-  tp.mutex.synchronize do
+  mutex.synchronize do
     puts msg
       # 'puts' needs to be synchronzied.
   end
