@@ -21,6 +21,7 @@ class ThreadPool
   def initialize num=1
     @thread_count=0
     @threads=[]
+      # Other option is to use ThreadGroup.
     @global_queue = Queue.new
     @mutex = Mutex.new
       # Private mutex.
@@ -38,13 +39,13 @@ class ThreadPool
   def increment num=1
     num.times do
       @mutex.synchronize do
-      @threads.push(
-        Thread.new do
-          loop do
-            @global_queue.pop.call
+        @threads.push(
+          Thread.new do
+            loop do
+              @global_queue.pop.call
+            end
           end
-        end
-      )
+        )
       end
     end
     @thread_count+=num
