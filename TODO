@@ -1,0 +1,17 @@
+[14-oct-09]
+* dispatch(lambda) to become dispatch(lambda,arg1,arg2...)
+* Move ThreadPool.rb into lib/ and create lib/threadpool for any 
+  future .rb files
+* Use Thread#[] to add properties like [:started] = Time.now etc
+* Create a ThreadGroup within a ThreadPool instance and add all
+  created threads to it.
+  #add, #list what else?
+* Have a response queue where threads from the pool can
+  push a return object.
+  The calling thread could wait on this queue.
+* Get rid of the mutex in thread pool.
+  Re-write live tests to use an independent mutex.
+  Does it make sense to have tp.mutex ??
+* ThreadPool.new(5,100) will create a threadpool with
+  sized queue of 100 entries.
+  Verify that the queue will block after 100

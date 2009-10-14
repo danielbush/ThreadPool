@@ -10,7 +10,7 @@ Send errors or issues to:
   Daniel Bush 
   email: dlb.id.au -at- gmail.com
 
-ThreadPool uses dispatch method with a block for putting jobs on
+ThreadPool uses a 'dispatch' method with a block for putting jobs on
 the queue to be processed asynchronously:
 
   tp = ThreadPool.new(5)  # Create 5 threads
@@ -21,7 +21,8 @@ the queue to be processed asynchronously:
 
 Or lambdas
 
-  tp.dispatch some_func
+  func = lambda { ... your task ... }
+  tp.dispatch func
 
 In fact as long as it responds to 'call' you're probably ok.
 
@@ -50,7 +51,9 @@ You can run all the live tests like this (in linux/unix shell):
   cd tests/live
   for i in *.rb; do echo; echo $i; echo '-------'; jruby $i; done|less
 
-
+Some rspec tests are in
+  specs/
+Install rspec (gem install rspec) and use the 'spec' command to run them.
 
 Regards,
 Daniel Bush
