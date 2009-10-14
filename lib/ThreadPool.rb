@@ -39,7 +39,15 @@ class ThreadPool
       @threads.push(
         Thread.new do
           loop do
-            @global_queue.pop.call
+            item = @global_queue.pop
+            case item
+            when Array
+              item[0].call(*item[1])
+                # item[0] should be lambda; 
+                # item[1] should be its args.
+            else
+              item.call
+            end
           end
         end
       )
@@ -80,14 +88,17 @@ class ThreadPool
 
   # Dispatch jobs asynchronously.
 
-  def dispatch func=nil , &block
-    if block_given?
-      @global_queue << func unless func.nil?
-      @global_queue << block
+  def dispatch func=nil , args=nil , &block
+    if func.nil?
+      raise "Must be called with a block or lambda." unless block_given?
     else
-      raise "Must be called with a block." if func.nil?
-      @global_queue << func
+      if args.nil?
+        @global_queue << func 
+      else
+        @global_queue << [func,args]
+      end
     end
+    @global_queue << block if block_given?
   end
 
   # A Queue that contains its own thread and which
