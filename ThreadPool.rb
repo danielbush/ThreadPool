@@ -15,6 +15,9 @@ class ThreadPool
   attr_reader :mutex , :threads , :thread_count
   attr_writer :debug
 
+  # Initialize a ThreadPool instance with 'num' number
+  # of threads.
+
   def initialize num=1
     @thread_count=0
     @threads=[]
