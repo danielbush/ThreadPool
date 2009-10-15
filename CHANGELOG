@@ -1,9 +1,9 @@
 
-Latest
+Latest [DB]
 - ThreadPool and SyncQueue are objects inside of ThreadPooling module.
 - Fixed thread-unsafe operations in ThreadPool#increment and #decrement.
 
-Version 0.3
+Version 0.3 [DB]
 - First commit to git and github.
 - We have 
   - a ThreadPool class which has a single queue and a store
