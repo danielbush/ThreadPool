@@ -2,6 +2,12 @@
 Latest [DB]
 - ThreadPool and SyncQueue are objects inside of ThreadPooling module.
 - Fixed thread-unsafe operations in ThreadPool#increment and #decrement.
+- ThreadPool#dispatch can take additional argument to a lambda; this
+  argument should be an array representing arguments to be given to
+  the lambda.
+  Why bother?  I'm interested in being able to reuse the same lambda
+  with different arguments.  That is, we have a pool of lambda's that
+  we reuse.  Or maybe one with parts that are synchronized.
 
 Version 0.3 [DB]
 - First commit to git and github.
