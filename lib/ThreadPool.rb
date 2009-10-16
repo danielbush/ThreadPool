@@ -43,7 +43,7 @@ module ThreadPooling
       @thread_count=0
       @threads=[]
         # Other option is to use ThreadGroup.
-      @global_queue = Queue.new
+      @queue = Queue.new
       @mutex = Mutex.new
         # Private mutex.
       self.increment(num)
@@ -63,7 +63,7 @@ module ThreadPooling
           @threads.push(
             Thread.new do
               loop do
-                item = @global_queue.pop
+                item = @queue.pop
                 case item
                 when Array
                   item[0].call(*item[1])
@@ -120,12 +120,12 @@ module ThreadPooling
         raise "Must be called with a block or lambda." unless block_given?
       else
         if args.nil?
-          @global_queue << func 
+          @queue << func 
         else
-          @global_queue << [func,args]
+          @queue << [func,args]
         end
       end
-      @global_queue << block if block_given?
+      @queue << block if block_given?
     end
 
   end
