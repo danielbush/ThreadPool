@@ -1,3 +1,8 @@
+[16-oct-09]
+- Passing in something that will block instead of queue - eg
+  a socket.  Does this make sense?
+- Having several queues?  Would this have an effect or does it
+  really matter?
 [14-oct-09]
 - How do we handle the issue of returning stuff?
   What's the best way for a thread in the thread pool to
