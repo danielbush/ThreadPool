@@ -114,18 +114,14 @@ module ThreadPooling
     end
 
     # Dispatch jobs asynchronously.
-
-    def dispatch func=nil , args=nil , &block
-      if func.nil?
-        raise "Must be called with a block or lambda." unless block_given?
+    def dispatch *args, &block
+      if block_given?
+        @queue << [block, args]
+      elsif args.first.respond_to? :call
+        @queue << [args.shift, args]
       else
-        if args.nil?
-          @queue << func 
-        else
-          @queue << [func,args]
-        end
+        raise "No block or proc to execute"
       end
-      @queue << block if block_given?
     end
 
   end
