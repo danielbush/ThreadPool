@@ -64,14 +64,7 @@ module ThreadPooling
             Thread.new do
               loop do
                 item = @queue.pop
-                case item
-                when Array
-                  item[0].call(*item[1])
-                    # item[0] should be lambda; 
-                    # item[1] should be its args.
-                else
-                  item.call
-                end
+                item.first.call(*item.last)
               end
             end
           )
