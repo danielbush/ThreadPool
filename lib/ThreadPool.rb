@@ -41,7 +41,7 @@ module ThreadPooling
 
     def initialize num=1
       @thread_count=0
-      @threads=[]
+      @threads = []
         # Other option is to use ThreadGroup.
       @queue = Queue.new
       @mutex = Mutex.new
@@ -64,26 +64,19 @@ module ThreadPooling
             Thread.new do
               loop do
                 item = @queue.pop
-                case item
-                when Array
-                  item[0].call(*item[1])
-                    # item[0] should be lambda; 
-                    # item[1] should be its args.
-                else
-                  item.call
-                end
+                item.first.call(*item.last)
               end
             end
           )
         end
       end
-      @thread_count+=num
+      @thread_count += num
     end
 
     # Remove threads from the pool
 
-    def decrement num=1
-      num=@thread_count if num>@thread_count
+    def decrement num = 1
+      num = @thread_count if num > @thread_count
       num.times do
         debug "Dispatching termination command" if @debug
         self.dispatch do
@@ -94,7 +87,7 @@ module ThreadPooling
           Thread.current.exit
         end
       end
-      @thread_count-=num
+      @thread_count -= num
     end
 
     # The thread that calls this will block until
@@ -103,7 +96,7 @@ module ThreadPooling
     # pool emptied.
 
     def join
-      threads=@threads.dup
+      threads = @threads.dup
         # Taking a copy here is really important!
       self.decrement @thread_count
         # Stop the threads or else suffer a deadlock.
@@ -114,18 +107,14 @@ module ThreadPooling
     end
 
     # Dispatch jobs asynchronously.
-
-    def dispatch func=nil , args=nil , &block
-      if func.nil?
-        raise "Must be called with a block or lambda." unless block_given?
+    def dispatch *args, &block
+      if block_given?
+        @queue << [block, args]
+      elsif args.first.respond_to? :call
+        @queue << [args.shift, args]
       else
-        if args.nil?
-          @queue << func 
-        else
-          @queue << [func,args]
-        end
+        raise "No block or proc to execute"
       end
-      @queue << block if block_given?
     end
 
   end
@@ -151,9 +140,9 @@ module ThreadPooling
   class SyncQueue < Queue
 
     def initialize
-      @processing=false
-      @stopping=false
-      @running=false
+      @processing = false
+      @stopping = false
+      @running = false
       super
       start
     end
@@ -181,9 +170,9 @@ module ThreadPooling
     # and returned
 
     def terminate
-      @running=false
-      @stopping=false
-      @left=[]
+      @running = false
+      @stopping = false
+      @left = []
       while self.size>0
         @left.push self.pop
       end
@@ -203,7 +192,7 @@ module ThreadPooling
     # SyncQueue#stop is used by SyncQueue#join.
 
     def stop
-      @stopping=true
+      @stopping = true
       self << lambda{ self.terminate }
         # Pass a terminate function as final
         # function on queue.  Will unblock thread
@@ -229,13 +218,13 @@ module ThreadPooling
 
     def start
       self.join if @running
-      @running=true
+      @running = true
       @thread = Thread.new do
         while @running
-          block=self.pop
-          @processing=true
+          block = self.pop
+          @processing = true
           block.call
-          @processing=false
+          @processing = false
         end
       end
     end
